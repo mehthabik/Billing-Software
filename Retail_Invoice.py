@@ -1,17 +1,20 @@
 #pip install tk  in your cmd
-#https://youtu.be/zK1H4etcb8M
 #use tab key to move side and down in the software
 
 from tkinter import *
 from tkcalendar import DateEntry
 from tkinter import ttk
+import pymysql
 
 root = Tk()
 root.title('Billing Software')
 root.geometry('250x200+250+200')
 bg_color = '#33ACFF'
 
-
+#================Database_connection=========
+connect = pymysql.connect(host='localhost',user='root',passwd='',database='i_k_stores_sales')
+cursor = connect.cursor()
+        
 #==============Top section=================
 title = Label(root,text='Retail Invoice',bg=bg_color,fg='white',font=('Bookman Old Style',24,'bold'),relief=GROOVE,bd=12)
 title.pack(fill=X)
@@ -74,7 +77,6 @@ for i in range(10):
     unit_pri_en.grid(row=i+1,column=4)
     gro_val_en = Entry(Input_frame,font=('Bookman Old Style',12,'bold'))
     gro_val_en.grid(row=i+1,column=5)
-    
 
 gro_tot = Entry(Input_frame,font=('Bookman Old Style',12,'bold'))
 gro_tot.insert(0,"Gross Total")
@@ -99,8 +101,31 @@ amount.grid(row=16,column=4)
 dec = Label(root,text="We declare that this invoice shows the actual price of the goods described and that all products are true and correct.",font=('Bookman Old Style',12,'bold'))
 dec.pack()
 
-sign_bt = Button(root,text="Authorized Signatory",font=('Bookman Old Style',12,'bold','italic'))
+
+
+#==========Save_data_to_database=======
+def save_data():
+    Invoice_no = inv_input.get()
+    Sl_no = slno_en .get()
+    Date  = date_input.get()
+    Description = desc_goods_en.get()
+    HSN_SAC  = hsn_sac_en.get()
+    Quantity = quant_en.get()
+    Unit_price = unit_pri_en.get()
+    Gross_value = gro_val_en.get()
+    Gross_total = gro_tot.get()
+    State_gst = st_gst.get()
+    Central_gst = cen_gst.get()
+    Round_off = rou_off.get()
+    Total = total.get()
+    Amount_in_words = amount.get()
+    cursor.execute("insert into Retail_Invoice(Invoice_no,Sl_no,Date,Description,HSN_SAC,Quantity,Unit_price,Gross_value,Gross_total, "\
+                   "State_gst,Central_gst,Round_off,Total,Amount_in_words) values ('"+Invoice_no+"','"+Sl_no+"','"+Date+"','"+Description+"','"+HSN_SAC+"','"+Quantity+"', "\
+                   " '"+Unit_price+"','"+Gross_value+"','"+Gross_total+"','"+State_gst+"','"+Central_gst+"','"+Round_off+"','"+Total+"', "\
+                   " '"+Amount_in_words+"')")
+    connect.commit()                  
+
+sign_bt = Button(root,text="Authorized Signatory",font=('Bookman Old Style',12,'bold','italic'),command=save_data)
 sign_bt.pack(side='right')
-
-
+       
 root.mainloop()
